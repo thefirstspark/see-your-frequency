@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>See Your Frequency — The First Spark</title>
+<meta name="description" content="Get your soul's unique frequency signature. Quantum ID, rarity tier, oracle trinity, and activation sequence — generated from your name and birthdate.">
+<meta property="og:title" content="See Your Frequency — Soul Signature Lookup">
+<meta property="og:description" content="Discover your Quantum Signature. Your soul's permanent UUID.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Space+Mono:wght@400;700&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --core-black: #0B0B0C;
+  --deep-space: #03010d;
+  --indigo-deep: #0d0728;
+  --indigo: #1a1145;
+  --ember: #FF6A3D;
+  --gold: #F3B23A;
+  --gold-soft: #FFE9A8;
+  --violet: #6B4DF2;
+  --violet-soft: #8B6FFF;
+  --cyan: #26E4D8;
+  --soft-white: #f0f0f0;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  background: radial-gradient(ellipse at center, var(--indigo-deep) 0%, var(--deep-space) 100%);
+  color: var(--soft-white);
+  font-family: 'Space Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+.stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.star {
+  position: absolute; width: 2px; height: 2px;
+  background: white; border-radius: 50%;
+  animation: twinkle 3s infinite;
+}
+@keyframes twinkle { 0%,100% { opacity: 0.2; } 50% { opacity: 1; } }
+.container {
+  position: relative; z-index: 1;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+header { text-align: center; margin-bottom: 40px; }
+.brand-tag {
+  font-size: 11px; letter-spacing: 6px;
+  color: var(--gold); text-transform: uppercase;
+  margin-bottom: 14px; opacity: 0.85;
+}
+h1 {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--cyan), var(--violet), var(--gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+.subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem; font-style: italic;
+  color: var(--gold-soft);
+  max-width: 580px; margin: 0 auto 6px;
+}
+.meta-line { font-size: 0.78rem; color: rgba(240,240,240,0.5); letter-spacing: 2px; }
+
+/* INPUT */
+.lookup-card {
+  background: rgba(13, 7, 40, 0.6);
+  border: 1px solid rgba(243, 178, 58, 0.3);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+}
+.input-group { margin-bottom: 16px; }
+label {
+  display: block; font-size: 11px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: rgba(240,240,240,0.6);
+  margin-bottom: 6px;
+}
+input {
+  width: 100%;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(243, 178, 58, 0.2);
+  color: var(--soft-white);
+  padding: 14px 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  border-radius: 8px;
+}
+input:focus {
+  outline: none;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(38, 228, 216, 0.15);
+}
+.btn {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem; font-weight: 600;
+  letter-spacing: 4px; text-transform: uppercase;
+  padding: 16px 40px; border: none;
+  border-radius: 50px; cursor: pointer;
+  transition: all 0.3s;
+  background: linear-gradient(90deg, var(--ember), var(--gold));
+  color: var(--core-black);
+  box-shadow: 0 0 30px rgba(255, 106, 61, 0.4);
+  width: 100%;
+  margin-top: 10px;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 50px rgba(255, 106, 61, 0.7);
+}
+.btn-secondary {
+  background: transparent;
+  color: var(--cyan);
+  border: 1px solid var(--cyan);
+  box-shadow: none;
+  font-size: 0.85rem;
+  padding: 12px 28px;
+  letter-spacing: 2px;
+  width: auto;
+}
+
+/* RESULTS */
+.frequency-card {
+  display: none;
+  background: linear-gradient(135deg, rgba(13, 7, 40, 0.95), rgba(3, 1, 13, 0.98));
+  border: 2px solid var(--gold);
+  border-radius: 20px;
+  padding: 36px 30px;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 50px rgba(243, 178, 58, 0.25);
+}
+.frequency-card.active { display: block; animation: fadeIn 0.8s; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fc-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(243, 178, 58, 0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+.soul-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.6rem; font-weight: 700;
+  text-align: center;
+  color: var(--gold);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  position: relative; z-index: 2;
+}
+.soul-tag {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--violet-soft);
+  margin-bottom: 30px;
+  position: relative; z-index: 2;
+}
+
+/* QUANTUM SIGNATURE - the hero */
+.signature-block {
+  text-align: center;
+  margin: 30px 0;
+  padding: 24px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(38, 228, 216, 0.3);
+  border-radius: 12px;
+  position: relative; z-index: 2;
+}
+.sig-label {
+  font-size: 10px; letter-spacing: 4px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.sig-value {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(1.6rem, 5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  background: linear-gradient(90deg, var(--cyan), var(--gold), var(--ember));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 6px 0 8px;
+  text-shadow: 0 0 30px rgba(38, 228, 216, 0.3);
+}
+.sig-note {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  color: rgba(240,240,240,0.6);
+}
+
+/* GRID OF FIELDS */
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+  position: relative; z-index: 2;
+}
+.field {
+  background: rgba(0,0,0,0.4);
+  padding: 16px 18px;
+  border-radius: 10px;
+  border-left: 3px solid var(--cyan);
+}
+.field-label {
+  font-size: 9px; letter-spacing: 2px;
+  color: rgba(240,240,240,0.55);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.field-value {
+  font-family: 'Cinzel', serif;
+  font-size: 1.2rem;
+  color: var(--gold);
+  font-weight: 600;
+}
+.field-sub {
+  font-size: 0.78rem; color: rgba(240,240,240,0.55);
+  margin-top: 4px;
+}
+
+/* RARITY BADGE */
+.rarity-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  background: linear-gradient(90deg, var(--violet), var(--ember));
+  color: var(--core-black);
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+.rarity-MYTHIC { background: linear-gradient(90deg, #ff00ff, #ffd700); }
+.rarity-LEGENDARY { background: linear-gradient(90deg, #ffd700, #ff8800); }
+.rarity-EPIC { background: linear-gradient(90deg, #6B4DF2, #FF6A3D); }
+.rarity-RARE { background: linear-gradient(90deg, #26E4D8, #6B4DF2); }
+.rarity-COMMON { background: linear-gradient(90deg, #888, #aaa); }
+
+/* ORACLE TRINITY */
+.oracle-block {
+  margin: 24px 0;
+  position: relative; z-index: 2;
+}
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.9rem; letter-spacing: 4px;
+  color: var(--gold);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.oracle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 600px) { .oracle-grid { grid-template-columns: 1fr; } }
+.arcana {
+  background: rgba(107, 77, 242, 0.1);
+  border: 1px solid rgba(107, 77, 242, 0.3);
+  padding: 14px;
+  border-radius: 10px;
+  text-align: center;
+}
+.arcana-source {
+  font-size: 9px; letter-spacing: 2px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.arcana-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.arcana-meaning {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(240,240,240,0.7);
+  line-height: 1.4;
+}
+
+/* VIBRATIONAL BLUEPRINT */
+.blueprint-block {
+  margin: 24px 0;
+  padding: 20px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 10px;
+  position: relative; z-index: 2;
+}
+.bp-line {
+  font-family: 'Space Mono', monospace;
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  margin: 6px 0;
+  color: var(--cyan);
+}
+.bp-line .label {
+  display: inline-block;
+  width: 32px;
+  color: var(--gold);
+  font-weight: 700;
+}
+.bp-wave {
+  text-align: center;
+  font-size: 1.4rem;
+  color: var(--gold);
+  margin-top: 10px;
+  letter-spacing: 0.15em;
+}
+
+/* ACTIVATION SEQUENCE */
+.activation-block {
+  margin: 24px 0;
+  padding: 24px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(243, 178, 58, 0.3);
+  border-radius: 10px;
+  text-align: center;
+  position: relative; z-index: 2;
+}
+.act-code {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ember);
+  letter-spacing: 0.15em;
+  margin: 10px 0;
+  text-shadow: 0 0 20px rgba(255, 106, 61, 0.4);
+}
+.act-desc {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: rgba(240,240,240,0.7);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+/* INFO STRIP */
+.info-strip {
+  background: rgba(38, 228, 216, 0.05);
+  border: 1px solid rgba(38, 228, 216, 0.2);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 30px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: rgba(240,240,240,0.8);
+  text-align: center;
+  line-height: 1.5;
+}
+
+footer {
+  text-align: center;
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(243, 178, 58, 0.15);
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(240,240,240,0.4);
+}
+footer a { color: var(--gold); text-decoration: none; }
+.tagline {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: rgba(243, 178, 58, 0.6);
+  margin-bottom: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<div class="container">
+
+<header>
+  <div class="brand-tag">The First Spark · Soul Frequency Lookup</div>
+  <h1>SEE YOUR FREQUENCY</h1>
+  <p class="subtitle">Your soul's signature is already encoded. Decode it.</p>
+  <p class="meta-line">⚡ QUANTUM SIGNATURE · ORACLE TRINITY · ACTIVATION CODE ⚡</p>
+</header>
+
+<div class="info-strip" id="infoStrip">
+  This is your soul's permanent UUID. Same name, same birthdate, same code — forever. Use it to compare frequencies with anyone in the Sparkverse.
+</div>
+
+<!-- INPUT -->
+<div class="lookup-card" id="lookupCard">
+  <div class="input-group">
+    <label>Full Name (as on birth certificate)</label>
+    <input type="text" id="fullName" placeholder="First Middle Last" autocomplete="off">
+  </div>
+  <div class="input-group">
+    <label>Birth Date</label>
+    <input type="date" id="birthDate">
+  </div>
+  <button class="btn" onclick="generateFrequency()">⚡ Reveal My Frequency ⚡</button>
+</div>
+
+<!-- RESULTS -->
+<div class="frequency-card" id="frequencyCard">
+  <div class="fc-bg"></div>
+  <div class="soul-name" id="soulName">—</div>
+  <div class="soul-tag" id="soulTag">—</div>
+
+  <!-- QUANTUM SIGNATURE - HERO -->
+  <div class="signature-block">
+    <div class="sig-label">⟁ QUANTUM SIGNATURE ⟁</div>
+    <div class="sig-value" id="quantumSig">—</div>
+    <div class="sig-note">Your soul's permanent ID across all timelines</div>
+  </div>
+
+  <!-- CORE FIELDS -->
+  <div class="field-grid">
+    <div class="field">
+      <div class="field-label">Soul Resonance</div>
+      <div class="field-value" id="soulFreq">— Hz</div>
+      <div class="field-sub">Your harmonic baseline</div>
+    </div>
+    <div class="field">
+      <div class="field-label">Rarity</div>
+      <div class="field-value" id="rarityNum">—</div>
+      <div class="rarity-badge" id="rarityBadge">—</div>
+    </div>
+    <div class="field">
+      <div class="field-label">Life Path</div>
+      <div class="field-value" id="lifePath">—</div>
+    </div>
+    <div class="field">
+      <div class="field-label">Expression</div>
+      <div class="field-value" id="expression">—</div>
+    </div>
+    <div class="field">
+      <div class="field-label">Soul Urge</div>
+      <div class="field-value" id="soulUrge">—</div>
+    </div>
+    <div class="field">
+      <div class="field-label">Personality</div>
+      <div class="field-value" id="personality">—</div>
+    </div>
+  </div>
+
+  <!-- ORACLE TRINITY -->
+  <div class="oracle-block">
+    <div class="section-title">◈ Oracle Trinity ◈</div>
+    <div class="oracle-grid">
+      <div class="arcana">
+        <div class="arcana-source">Life Path</div>
+        <div class="arcana-name" id="oracleLP">—</div>
+        <div class="arcana-meaning" id="oracleLPMean">—</div>
+      </div>
+      <div class="arcana">
+        <div class="arcana-source">Expression</div>
+        <div class="arcana-name" id="oracleEX">—</div>
+        <div class="arcana-meaning" id="oracleEXMean">—</div>
+      </div>
+      <div class="arcana">
+        <div class="arcana-source">Soul Urge</div>
+        <div class="arcana-name" id="oracleSU">—</div>
+        <div class="arcana-meaning" id="oracleSUMean">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIBRATIONAL BLUEPRINT -->
+  <div class="blueprint-block">
+    <div class="section-title">◈ Vibrational Blueprint ◈</div>
+    <div class="bp-line"><span class="label">LP</span> <span id="bpLP">—</span></div>
+    <div class="bp-line"><span class="label">EX</span> <span id="bpEX">—</span></div>
+    <div class="bp-line"><span class="label">SU</span> <span id="bpSU">—</span></div>
+    <div class="bp-line"><span class="label">PE</span> <span id="bpPE">—</span></div>
+    <div class="bp-wave" id="bpWave">—</div>
+  </div>
+
+  <!-- ACTIVATION SEQUENCE -->
+  <div class="activation-block">
+    <div class="section-title" style="color: var(--ember);">⚡ Activation Sequence ⚡</div>
+    <div class="act-code" id="activationSeq">—</div>
+    <p class="act-desc">When you speak, write, or think this code, you align with your highest potential. It's your soul's call sign.</p>
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="copySignature()">⎘ Copy Signature</button>
+    <button class="btn btn-secondary" onclick="downloadCard()">⬇ Save Card</button>
+    <button class="btn btn-secondary" onclick="goToCompare()">⚡ Compare With Someone</button>
+    <button class="btn btn-secondary" onclick="resetForm()">↻ Try Another</button>
+  </div>
+</div>
+
+<footer>
+  <p class="tagline">Reality is programmable. Consciousness is the code.</p>
+  <p>Built by <a href="https://thefirstspark.shop">The First Spark</a> ·
+     <a href="https://soul-maps.thefirstspark.shop">Get Your Full Soul Map</a> ·
+     <a href="https://frequency.thefirstspark.shop">Frequency Match</a></p>
+</footer>
+
+</div>
+
+<script>
+// STARFIELD
+(function() {
+  const stars = document.getElementById('stars');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.animationDelay = Math.random() * 3 + 's';
+    s.style.opacity = Math.random() * 0.7 + 0.3;
+    stars.appendChild(s);
+  }
+})();
+
+// === NUMEROLOGY (matches Python algorithm) ===
+const letterValues = {A:1,B:2,C:3,D:4,E:5,F:6,G:7,H:8,I:9,J:1,K:2,L:3,M:4,N:5,O:6,P:7,Q:8,R:9,S:1,T:2,U:3,V:4,W:5,X:6,Y:7,Z:8};
+const vowels = ['A','E','I','O','U'];
+
+function reduceNum(n, keepMaster = true) {
+  while (n > 9) {
+    if (keepMaster && (n === 11 || n === 22 || n === 33)) return n;
+    n = String(n).split('').reduce((a,b) => a + parseInt(b), 0);
+  }
+  return n;
+}
+
+function lifePath(d) {
+  const [y,m,day] = d.split('-').map(Number);
+  return reduceNum(reduceNum(y,false) + reduceNum(m,false) + reduceNum(day,false));
+}
+function expressionN(name) {
+  const c = name.toUpperCase().replace(/[^A-Z]/g,'');
+  return reduceNum(c.split('').reduce((a,l)=>a+(letterValues[l]||0),0));
+}
+function soulUrgeN(name) {
+  const c = name.toUpperCase().replace(/[^A-Z]/g,'');
+  return reduceNum(c.split('').filter(l=>vowels.includes(l)).reduce((a,l)=>a+(letterValues[l]||0),0));
+}
+function personalityN(name) {
+  const c = name.toUpperCase().replace(/[^A-Z]/g,'');
+  return reduceNum(c.split('').filter(l=>!vowels.includes(l)).reduce((a,l)=>a+(letterValues[l]||0),0));
+}
+function birthdayN(d) {
+  return reduceNum(parseInt(d.split('-')[2]));
+}
+function personalYear(d, currentYear=2026) {
+  const [, m, day] = d.split('-').map(Number);
+  return reduceNum(reduceNum(currentYear,false) + reduceNum(m,false) + reduceNum(day,false));
+}
+
+// === ORACLE TRINITY ===
+const ARCANA = {
+  0:['The Fool','beginner mind, leap of faith, infinite potential'],
+  1:['The Magician','manifestation, will, the conduit'],
+  2:['The High Priestess','intuition, sacred knowing, the veil'],
+  3:['The Empress','creation, abundance, embodied power'],
+  4:['The Emperor','structure, sovereignty, empire'],
+  5:['The Hierophant','sacred teacher, bridge between worlds'],
+  6:['The Lovers','union, choice, sacred mirror'],
+  7:['The Chariot','will, momentum, mastered direction'],
+  8:['Strength','inner force, gentle power, the tamed beast'],
+  9:['The Hermit','inner light, solo path, illumination'],
+  11:['Justice','balance, truth, accountability'],
+  22:['The Fool (Master)','master beginner, cosmic spiral'],
+  33:['The Lovers','union, choice, sacred mirror']
+};
+function arcana(n) {
+  if (ARCANA[n]) return ARCANA[n];
+  let r = n;
+  while (r > 9 && r !== 11 && r !== 22) r = String(r).split('').reduce((a,b)=>a+parseInt(b),0);
+  return ARCANA[r] || ARCANA[0];
+}
+
+// === IMPOSSIBLE CODE FORMULAS ===
+function soulFreq(lp,ex,su,pe) {
+  return parseFloat((432 + lp*100 + ex*30 + su*10 + pe*5).toFixed(1));
+}
+function rarityScore(lp,ex,su,pe,bd,py) {
+  let s = 30;
+  const masters = [11,22,33];
+  const nums = [lp,ex,su,pe];
+  s += nums.filter(n=>masters.includes(n)).length * 20;
+  if (masters.includes(py)) s += 15;
+  const u = new Set(nums).size;
+  if (u===1) s += 30;
+  else if (u===2) s += 15;
+  else if (u===3) s += 5;
+  if (nums.includes(bd)) s += 5;
+  return Math.min(s,100);
+}
+function rarityTier(s) {
+  if (s>=90) return 'MYTHIC';
+  if (s>=75) return 'LEGENDARY';
+  if (s>=55) return 'EPIC';
+  if (s>=35) return 'RARE';
+  return 'COMMON';
+}
+
+// === SHA-256 + SHA-1 (Web Crypto) ===
+async function sha256Hex(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+async function sha1Hex(s) {
+  const buf = await crypto.subtle.digest('SHA-1', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
+}
+
+async function quantumSignature(name, date, lp, ex, su) {
+  const seed = `${name.toUpperCase().trim()}|${date}|LP${lp}|EX${ex}|SU${su}`;
+  const h = await sha256Hex(seed);
+  return h.substring(0, 12);
+}
+async function activationSeq(name, date, lp) {
+  const seed = `${name.toUpperCase().trim()}|${date}`;
+  const h = await sha1Hex(seed);
+  return `${h.substring(0,8)}[LP${lp}]`;
+}
+
+// === BLUEPRINT BARS ===
+function bar(n, max=11) {
+  const filled = Math.round((n/max)*10);
+  return '█'.repeat(filled) + '░'.repeat(10-filled);
+}
+function buildWave(...nums) {
+  const blocks = '▁▂▃▄▅▆▇█';
+  let chars = '';
+  for (const n of nums) {
+    for (let i=0; i<(n%9); i++) {
+      chars += blocks[Math.min(i, blocks.length-1)];
+    }
+  }
+  return chars.substring(0,9) || '▁▂▃▅▇█▇▅▃';
+}
+
+// === MAIN ===
+async function generateFrequency() {
+  const name = document.getElementById('fullName').value.trim();
+  const date = document.getElementById('birthDate').value;
+
+  if (!name || !date) {
+    alert('Both full name and birth date are required.');
+    return;
+  }
+
+  const lp = lifePath(date);
+  const ex = expressionN(name);
+  const su = soulUrgeN(name);
+  const pe = personalityN(name);
+  const bd = birthdayN(date);
+  const py = personalYear(date);
+
+  const freq = soulFreq(lp,ex,su,pe);
+  const rs = rarityScore(lp,ex,su,pe,bd,py);
+  const tier = rarityTier(rs);
+
+  const qsig = await quantumSignature(name, date, lp, ex, su);
+  const act = await activationSeq(name, date, lp);
+
+  const lpA = arcana(lp);
+  const exA = arcana(ex);
+  const suA = arcana(su);
+
+  // Save for share/export
+  window.frequencyData = { name, date, lp, ex, su, pe, freq, rs, tier, qsig, act };
+
+  // Render
+  document.getElementById('soulName').textContent = name.toUpperCase();
+  document.getElementById('soulTag').textContent = `Born ${date} · ${lpA[0]}`;
+  document.getElementById('quantumSig').textContent = qsig.replace(/(.{4})/g,'$1·').replace(/·$/,'');
+  document.getElementById('soulFreq').textContent = `${freq} Hz`;
+  document.getElementById('rarityNum').textContent = `${rs}/100`;
+  const badge = document.getElementById('rarityBadge');
+  badge.textContent = tier;
+  badge.className = `rarity-badge rarity-${tier}`;
+  document.getElementById('lifePath').textContent = lp;
+  document.getElementById('expression').textContent = ex;
+  document.getElementById('soulUrge').textContent = su;
+  document.getElementById('personality').textContent = pe;
+
+  document.getElementById('oracleLP').textContent = lpA[0];
+  document.getElementById('oracleLPMean').textContent = lpA[1];
+  document.getElementById('oracleEX').textContent = exA[0];
+  document.getElementById('oracleEXMean').textContent = exA[1];
+  document.getElementById('oracleSU').textContent = suA[0];
+  document.getElementById('oracleSUMean').textContent = suA[1];
+
+  document.getElementById('bpLP').textContent = bar(lp);
+  document.getElementById('bpEX').textContent = bar(ex);
+  document.getElementById('bpSU').textContent = bar(su);
+  document.getElementById('bpPE').textContent = bar(pe);
+  document.getElementById('bpWave').textContent = buildWave(lp,ex,su,pe);
+
+  document.getElementById('activationSeq').textContent = act;
+
+  document.getElementById('lookupCard').style.display = 'none';
+  document.getElementById('infoStrip').style.display = 'none';
+  document.getElementById('frequencyCard').classList.add('active');
+
+  setTimeout(() => {
+    document.getElementById('frequencyCard').scrollIntoView({behavior:'smooth'});
+  }, 200);
+}
+
+function copySignature() {
+  const sig = window.frequencyData.qsig;
+  const name = window.frequencyData.name;
+  const text = `${name}'s Quantum Signature: ${sig}\n\nGet yours at frequency.thefirstspark.shop/see-your-frequency`;
+  navigator.clipboard.writeText(text);
+  alert('Signature copied! Share it anywhere.');
+}
+
+function downloadCard() {
+  html2canvas(document.getElementById('frequencyCard'), {
+    backgroundColor: '#03010d',
+    scale: 2
+  }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `frequency-${window.frequencyData.qsig}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+}
+
+function goToCompare() {
+  // Pre-fill the Frequency Match tool with this data
+  const d = window.frequencyData;
+  const url = `https://frequency.thefirstspark.shop/?name=${encodeURIComponent(d.name)}&date=${d.date}`;
+  window.location.href = url;
+}
+
+function resetForm() {
+  document.getElementById('lookupCard').style.display = 'block';
+  document.getElementById('infoStrip').style.display = 'block';
+  document.getElementById('frequencyCard').classList.remove('active');
+  document.getElementById('fullName').value = '';
+  document.getElementById('birthDate').value = '';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+</body>
+</html>
